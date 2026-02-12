@@ -1,5 +1,11 @@
 name: CI # Só para questão de organização, pode ser qualquer nome
 
+# Quando acontecer X coisa, a pipe executa
+on: # Dita qual o evento que vai triggar a pipeline (a partir dele que a pipe funciona)
+  push:
+    branches:
+      - main
+
 jobs:
   build:
     name: "Build and Push" # nome do job, pode ser qualquer nome
