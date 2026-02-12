@@ -9,7 +9,12 @@ on: # Dita qual o evento que vai triggar a pipeline (a partir dele que a pipe fu
 jobs:
   build:
     name: "Build and Push" # nome do job, pode ser qualquer nome
+    
     runs-on: ubuntu-latest # ambiente de execução (máquina virtual) onde o job será executado - Runner do GitHub Actions
+    
+    strategy: # Estratégia de execução do job, onde podemos definir uma matriz de variáveis para rodar o job em diferentes ambientes ou configurações
+      matrix: # Nome da matriz, pode ser qualquer nome
+        node: [ 18, 20, 24 ] # Variável "node" com os valores 18, 20 e 24, indicando as versões do Node.js que serão testadas
 
     steps:
       - name: "Checkout code"
@@ -18,8 +23,9 @@ jobs:
       - name: "Setup node"
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: ${{ matrix.node }} # Acessa a variável "node" da matriz para configurar a versão do Node.js
           cache: "npm"
+
       # Comandos após a configuração do node
       - run: npm ci
       - run: npm run test
