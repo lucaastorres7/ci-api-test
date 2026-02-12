@@ -1,0 +1,10 @@
+name: CI # Só para questão de organização, pode ser qualquer nome
+
+jobs:
+  build:
+    name: "Build and Push" # nome do job, pode ser qualquer nome
+    runs-on: ubuntu-latest # ambiente de execução (máquina virtual) onde o job será executado - Runner do GitHub Actions
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v4
