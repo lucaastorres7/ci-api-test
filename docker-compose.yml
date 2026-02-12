@@ -1,0 +1,39 @@
+services:
+  mysql:
+    image: "mysql:8"
+    container_name: mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - netwoki
+    volumes:
+      - mysql-data:/var/lib/mysql
+    environment:
+      - MYSQL_DATABASE=app-db
+      - MYSQL_USER=user
+      - MYSQL_ROOT_PASSWORD=user
+
+  api-lucas:
+    build: .
+    container_name: api-lucas
+    ports:
+      - "3000:3000"
+    networks:
+      - netwoki
+    depends_on:
+      - mysql
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=app-db
+      - DB_USER=user  
+      - DB_PASSWORD=user
+
+volumes:
+  mysql-data:
+    name: mysql-data
+
+networks:
+  netwoki:
+    name: netwoki
+    external: true
+    driver: bridge
