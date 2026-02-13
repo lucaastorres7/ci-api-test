@@ -20,7 +20,7 @@ jobs:
       - name: "Checkout code"
         uses: actions/checkout@v4
       
-      - name: "Setup node"
+      - name: "Setup node | ${{ matrix.node }}" # Colocamos a variável node para sabermos qual versão do node está sendo configurada
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }} # Acessa a variável "node" da matriz para configurar a versão do Node.js
@@ -29,3 +29,7 @@ jobs:
       # Comandos após a configuração do node
       - run: npm ci
       - run: npm run test
+
+      # 1 de fazer o build da imagem e subir para o Docker Hub
+      - name: "Build Docker Image"
+        run: docker build -t lucastorres7/ci-node:${{ github.sha }} -t lucastorres7/ci-node:latest .
