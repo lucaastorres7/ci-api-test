@@ -11,25 +11,29 @@ jobs:
     name: "Build and Push" # nome do job, pode ser qualquer nome
     
     runs-on: ubuntu-latest # ambiente de execução (máquina virtual) onde o job será executado - Runner do GitHub Actions
-    
-    strategy: # Estratégia de execução do job, onde podemos definir uma matriz de variáveis para rodar o job em diferentes ambientes ou configurações
-      matrix: # Nome da matriz, pode ser qualquer nome
-        node: [ 18, 20, 24 ] # Variável "node" com os valores 18, 20 e 24, indicando as versões do Node.js que serão testadas
-
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
       
-      - name: "Setup node | ${{ matrix.node }}" # Colocamos a variável node para sabermos qual versão do node está sendo configurada
+      - name: "Setup node" # Colocamos a variável node para sabermos qual versão do node está sendo configurada
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node }} # Acessa a variável "node" da matriz para configurar a versão do Node.js
+          node-version: 24
           cache: "npm"
 
       # Comandos após a configuração do node
       - run: npm ci
       - run: npm run test
 
+      - name: "Generate Tag"
+        id: generate_tag # ID do step, para que possamos referenciar ele depois (para pegar o output do step)
+        # Gera uma tag e coloca no output do job, para ser usada posteriormente (mais facilmente) - O output é uma variável de ambiente que pode ser usada em outros steps
+        run: |
+          SHA=$(echo $GITHUB_SHA | head -c 7)
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+
+
       # 1 de fazer o build da imagem e subir para o Docker Hub
       - name: "Build Docker Image"
-        run: docker build -t lucastorres7/ci-node:${{ github.sha }} -t lucastorres7/ci-node:latest .
+        # Acessamos a variável de ambiente do step anterior para usar na tag da imagem usando o id do step e o nome do output
+        run: docker build -t lucastorres7/ci-node:${{ steps.generate_tag.outputs.sha }} -t lucastorres7/ci-node:latest .
