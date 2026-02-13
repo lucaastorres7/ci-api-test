@@ -25,6 +25,12 @@ jobs:
       - run: npm ci
       - run: npm run test
 
+      - name: "Login to Docker Hub"
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: "Generate Tag"
         id: generate_tag # ID do step, para que possamos referenciar ele depois (para pegar o output do step)
         # Gera uma tag e coloca no output do job, para ser usada posteriormente (mais facilmente) - O output é uma variável de ambiente que pode ser usada em outros steps
@@ -37,3 +43,7 @@ jobs:
       - name: "Build Docker Image"
         # Acessamos a variável de ambiente do step anterior para usar na tag da imagem usando o id do step e o nome do output
         run: docker build -t lucastorres7/ci-node:${{ steps.generate_tag.outputs.sha }} -t lucastorres7/ci-node:latest .
+
+        # 1 de subir para o Docker Hub
+      - name: "Push Docker Image"
+        run: docker push lucastorres7/ci-node:${{ steps.generate_tag.outputs.sha }} && docker push lucastorres7/ci-node:latest
